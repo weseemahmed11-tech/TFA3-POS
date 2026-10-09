@@ -1,46 +1,51 @@
-# IT0049 Technical Formative Assessment 2
+# IT0049 Technical Formative Assessment 3
 
-## From Arrays to a Real Database
-
-This continues the four-page CodeIgniter 4 project from TFA1. The Customer Accounts and User Accounts pages now read fictional records from MySQL through CodeIgniter Models. It is a read-only learning activity, not a complete POS system.
+This CodeIgniter 4 POS application continues TFA2 with customer and user create/edit forms, server-side validation, and user avatars. It is a learning project and does not include authentication.
 
 ## Requirements
 
 - PHP 8.2 or newer with `intl`, `mbstring`, and `mysqli` enabled
 - Composer 2
-- MySQL or MariaDB (XAMPP's MySQL service works locally)
+- MySQL or MariaDB
 
 ## Local setup
 
-1. Run `composer install` in the project root to install the framework dependencies, if needed.
-2. Start MySQL. Import `database/pos_tfa2.sql` into an empty server. For XAMPP on Windows, from the project root run:
+1. Run `composer install` in the project root if needed.
+2. Start MySQL and import `database/pos_tfa3.sql` into an empty server. With XAMPP on Windows:
 
    ```powershell
-   & 'C:\xampp\mysql\bin\mysql.exe' --user=root --execute="source database/pos_tfa2.sql"
+   & 'C:\xampp\mysql\bin\mysql.exe' --user=root --execute="source database/pos_tfa3.sql"
    ```
 
-   Use your own MySQL username and connection options if they differ. The script creates the `pos_tfa2` database, the exact `customers` and `users` tables, and five sample rows in each. It is a setup script for an empty database; do not re-import it over existing tables.
-3. Copy `.env.example` to `.env` if `.env` does not already exist. Set `app.baseURL` to your local URL with a trailing slash and fill in the real `database.default.*` settings. The local XAMPP setup uses `http://localhost:8080/`, host `127.0.0.1`, database `pos_tfa2`, MySQLi, and port `3306`. Set the username and password for your own MySQL installation. `.env` is ignored by Git.
+   The script creates the `pos_tfa3` database, the `customers` and `users` tables, and sample rows. Do not re-import it over existing tables.
+3. Copy `.env.example` to `.env` if `.env` does not exist. Set `app.baseURL` and the real `database.default.*` values. The example uses `http://localhost:8080/`, database `pos_tfa3`, MySQLi, and port `3306`.
 4. Run `php spark serve` and open `http://localhost:8080/`.
 
-If using another web server, point its document root at `public/`. The four routes are `/`, `/about`, `/customers`, and `/users`.
+The document root for another web server must be `public/`. Uploaded avatars are stored in `public/uploads`; the folder is included in the project with an `index.html` placeholder.
 
-## How it works
+## Routes and testing
 
-`app/Config/Routes.php` sends a URL to its controller. The Customers and Users controllers call their Models, which use the configured MySQL connection to read the tables. Each controller passes its records to a view; `foreach` creates the table rows, and `esc()` escapes their displayed values. The shared header and `public/css/style.css` keep the same simple navigation and styling as TFA1.
+- `/`, `/about`, `/customers`, and `/users` preserve the TFA2 pages.
+- `/customers/new` creates a customer; `/customers/{id}/edit` edits one.
+- `/users/new` creates a user; `/users/{id}/edit` edits one.
 
-TFA1 showed a Role column on the user page. TFA2's required `users` table has no `role` field, so the TFA2 page shows only Username and Full Name. Confirm this difference with the instructor; no role data was invented.
+Customer full name and email are required, and email must be valid. User username and full name are required, and usernames must be unique. Avatars accept JPG or PNG files up to 2 MB; files receive a random safe filename and only that filename is stored in the database. Users without an avatar show a placeholder.
 
-## Database export and submission
-
-`database/pos_tfa2.sql` is the importable setup script. `database/pos_tfa2_export.sql` is an export generated from the populated local database. If you need a fresh export after changing the data, run this from the project root with your own connection settings:
+Run the safe checks from the project root:
 
 ```powershell
-& 'C:\xampp\mysql\bin\mysqldump.exe' --user=root --databases pos_tfa2 --skip-add-drop-table --result-file=database/pos_tfa2_export.sql
+php spark routes
+php -l app\Controllers\Customers.php
+php -l app\Controllers\Users.php
+vendor\bin\phpunit
 ```
 
-Submission checklist:
+For browser testing, open each new route, submit blank and invalid values to confirm validation, create/edit valid records, test duplicate usernames, and upload valid and invalid avatar files. Do not use destructive database commands.
 
-- [ ] [GitHub repository](https://github.com/weseemahmed11-tech/TA1) includes the project files and database export.
-- [ ] A working hosted application URL is supplied after deployment.
-- [ ] Hosted `.env` settings use that host's database credentials and base URL; do not commit `.env`.
+## Database files
+
+`database/pos_tfa3.sql` is the setup script. `database/pos_tfa3_export.sql` is the matching schema/data export, including the nullable `users.avatar` column. To generate a fresh export from a populated database:
+
+```powershell
+& 'C:\xampp\mysql\bin\mysqldump.exe' --user=root --databases pos_tfa3 --skip-add-drop-table --result-file=database/pos_tfa3_export.sql
+```

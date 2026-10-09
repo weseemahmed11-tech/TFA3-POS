@@ -7,12 +7,15 @@
     <link rel="stylesheet" href="<?= base_url('css/style.css') ?>">
 </head>
 <body>
-    <header>
-        <nav aria-label="Main navigation">
+    <header class="site-header">
+        <div class="container">
+            <a class="brand" href="<?= site_url('/') ?>">Basic POS Project</a>
+            <nav aria-label="Main navigation">
             <a href="<?= site_url('/') ?>">Home</a>
             <a href="<?= site_url('about') ?>">About</a>
             <a href="<?= site_url('customers') ?>">Customer Accounts</a>
             <a href="<?= site_url('users') ?>">User Accounts</a>
-        </nav>
+            </nav>
+        </div>
     </header>
-    <main>
+    <main class="container">
